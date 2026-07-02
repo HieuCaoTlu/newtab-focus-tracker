@@ -33,7 +33,8 @@ const focusActiveTime = document.getElementById("focus-active-time");
 const focusActiveDomains = document.getElementById("focus-active-domains");
 const focusAddDomainForm = document.getElementById("focus-add-domain-form");
 const focusAddDomainInput = document.getElementById("focus-add-domain-input");
-const themeToggle = document.getElementById("theme-toggle");
+const themeGroup = document.getElementById("theme-group");
+const languageGroup = document.getElementById("language-group");
 const settingsToggle = document.getElementById("settings-toggle");
 const settingsMenu = document.getElementById("settings-menu");
 const exportBtn = document.getElementById("export-btn");
@@ -129,18 +130,18 @@ function formatRemaining(deadline) {
   const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
-    return { text: `Quá hạn ${Math.abs(diffDays)} ngày`, status: "overdue" };
+    return { text: t("overdueDays", Math.abs(diffDays)), status: "overdue" };
   }
   if (diffDays === 0) {
-    return { text: "Hôm nay", status: "urgent" };
+    return { text: t("todayText"), status: "urgent" };
   }
   if (diffDays === 1) {
-    return { text: "Còn 1 ngày", status: "urgent" };
+    return { text: t("oneDayLeft"), status: "urgent" };
   }
   if (diffDays <= 3) {
-    return { text: `Còn ${diffDays} ngày`, status: "urgent" };
+    return { text: t("daysLeft", diffDays), status: "urgent" };
   }
-  return { text: `Còn ${diffDays} ngày`, status: "normal" };
+  return { text: t("daysLeft", diffDays), status: "normal" };
 }
 
 async function render() {
@@ -175,7 +176,7 @@ async function render() {
     li.className = `task-item ${status}`;
     li.dataset.id = task.id;
 
-    const deadlineStr = new Date(task.deadline).toLocaleDateString("vi-VN", {
+    const deadlineStr = new Date(task.deadline).toLocaleDateString(localeTag(), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -219,6 +220,10 @@ const RANDOM_EMOJIS = [
 
 function randomEmoji() {
   return RANDOM_EMOJIS[Math.floor(Math.random() * RANDOM_EMOJIS.length)];
+}
+
+function localeTag() {
+  return getLanguage() === "vi" ? "vi-VN" : "en-US";
 }
 
 function escapeHtml(str) {
@@ -375,15 +380,38 @@ async function loadTheme() {
 function applyTheme(theme) {
   document.documentElement.classList.toggle("light", theme === "light");
   localStorage.setItem("theme", theme);
-  const icon = themeToggle.querySelector("i");
-  icon.className = theme === "light" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  themeGroup.querySelectorAll(".language-pill").forEach((pill) => {
+    pill.classList.toggle("active", pill.dataset.theme === theme);
+  });
 }
 
-themeToggle.addEventListener("click", async () => {
-  const isLight = document.documentElement.classList.contains("light");
-  const newTheme = isLight ? "dark" : "light";
+themeGroup.addEventListener("click", async (e) => {
+  const pill = e.target.closest(".language-pill");
+  if (!pill) return;
+  const newTheme = pill.dataset.theme;
   applyTheme(newTheme);
   chrome.storage.local.set({ [THEME_KEY]: newTheme });
+});
+
+// Language switcher
+function updateLanguageToggleLabel() {
+  languageGroup.querySelectorAll(".language-pill").forEach((pill) => {
+    pill.classList.toggle("active", pill.dataset.lang === getLanguage());
+  });
+}
+
+languageGroup.addEventListener("click", async (e) => {
+  const pill = e.target.closest(".language-pill");
+  if (!pill) return;
+  const newLang = pill.dataset.lang;
+  if (newLang === getLanguage()) return;
+
+  await setLanguage(newLang);
+  updateLanguageToggleLabel();
+  await render();
+  await renderHabits();
+  await renderHistory();
+  await updateFocusButtonState();
 });
 
 // Settings dropdown
@@ -403,13 +431,13 @@ async function renderHistory() {
   const history = await loadHistory();
 
   if (history.length === 0) {
-    historyList.innerHTML = `<li class="empty">Chưa có công việc đã hoàn thành</li>`;
+    historyList.innerHTML = `<li class="empty">${t("noCompletedTasks")}</li>`;
     return;
   }
 
   historyList.innerHTML = "";
   for (const item of history) {
-    const dateStr = new Date(item.completedAt).toLocaleDateString("vi-VN", {
+    const dateStr = new Date(item.completedAt).toLocaleDateString(localeTag(), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -421,11 +449,11 @@ async function renderHistory() {
     li.innerHTML = `
       <div class="task-icon">
         <span class="task-emoji">${escapeHtml(item.emoji)}</span>
-        <button type="button" class="history-remove" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+        <button type="button" class="history-remove" title="${t("deleteTitle")}"><i class="fa-solid fa-trash"></i></button>
       </div>
       <div class="history-info">
         <div class="history-title">${escapeHtml(item.title)}</div>
-        <div class="history-date">Hoàn thành: ${dateStr}</div>
+        <div class="history-date">${t("completedOn", dateStr)}</div>
       </div>
     `;
     li.querySelector(".history-remove").addEventListener("click", async () => {
@@ -485,11 +513,11 @@ async function updateFocusButtonState() {
   if (currentFocusSession) {
     focusToggleIcon.className = "fa-solid fa-hourglass-half fa-spin-pulse";
     focusToggleLabel.textContent = formatFocusRemaining(currentFocusSession.endTime - Date.now());
-    focusToggle.title = "Đang trong chế độ Focus";
+    focusToggle.title = t("focusActiveButtonTitle");
   } else {
     focusToggleIcon.className = "fa-solid fa-crosshairs";
-    focusToggleLabel.textContent = "Tập trung";
-    focusToggle.title = "Focus";
+    focusToggleLabel.textContent = t("focusBtn");
+    focusToggle.title = t("focusTitle");
   }
 
   if (!focusModalOverlay.classList.contains("hidden")) {
@@ -638,7 +666,7 @@ importFile.addEventListener("change", async () => {
     await render();
     await renderHabits();
   } catch (err) {
-    alert("Không thể nhập dữ liệu: file không hợp lệ.");
+    alert(t("importInvalid"));
   } finally {
     importFile.value = "";
     settingsMenu.classList.add("hidden");
@@ -669,9 +697,10 @@ function computeStreak(habit) {
 
 function getHabitFreqText(habit) {
   if (habit.frequency === "daily" || (habit.days || []).length === 7) {
-    return "Mọi ngày";
+    return t("everyDay");
   }
-  return (habit.days || []).map((d) => ["CN", "T2", "T3", "T4", "T5", "T6", "T7"][d]).join(", ");
+  const dayKeys = ["daySun", "dayMon", "dayTue", "dayWed", "dayThu", "dayFri", "daySat"];
+  return (habit.days || []).map((d) => t(dayKeys[d])).join(", ");
 }
 
 async function renderHabits() {
@@ -710,9 +739,9 @@ async function renderHabits() {
       <div class="habit-icon">${escapeHtml(habit.emoji)}</div>
       <div class="habit-title">${escapeHtml(habit.title)}</div>
       <div class="habit-streak ${done ? "active" : ""}">
-        ${streak > 0 ? `<i class="fa-solid fa-fire"></i> ${streak} ngày` : freqText}
+        ${streak > 0 ? `<i class="fa-solid fa-fire"></i> ${t("streakDays", streak)}` : freqText}
       </div>
-      ${!done ? `<div class="habit-done-overlay">Đánh dấu xong</div>` : ""}
+      ${!done ? `<div class="habit-done-overlay">${t("markAsDone")}</div>` : ""}
     `;
 
     card.addEventListener("click", async () => {
@@ -821,7 +850,7 @@ async function renderHabitModalList() {
   const habits = await loadHabits();
 
   if (habits.length === 0) {
-    habitModalList.innerHTML = `<li class="empty">Chưa có thói quen nào</li>`;
+    habitModalList.innerHTML = `<li class="empty">${t("noHabitsYet")}</li>`;
     return;
   }
 
@@ -855,11 +884,11 @@ async function openHabitDetail(id) {
 
   const dates = [...(habit.completedDates || [])].sort().reverse();
   if (dates.length === 0) {
-    habitDetailList.innerHTML = `<li class="empty">Chưa có ngày nào được đánh dấu</li>`;
+    habitDetailList.innerHTML = `<li class="empty">${t("noDaysMarked")}</li>`;
   } else {
     habitDetailList.innerHTML = "";
     for (const date of dates) {
-      const dateStr = new Date(date).toLocaleDateString("vi-VN", {
+      const dateStr = new Date(date).toLocaleDateString(localeTag(), {
         weekday: "long",
         day: "2-digit",
         month: "2-digit",
@@ -870,7 +899,7 @@ async function openHabitDetail(id) {
       li.className = "habit-detail-item";
       li.innerHTML = `
         <span>${escapeHtml(dateStr)}</span>
-        <button type="button" class="habit-detail-remove" title="Xóa"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="habit-detail-remove" title="${t("deleteTitle")}"><i class="fa-solid fa-xmark"></i></button>
       `;
       li.querySelector(".habit-detail-remove").addEventListener("click", async () => {
         await removeHabitDate(id, date);
@@ -1091,12 +1120,19 @@ habitList.addEventListener("wheel", (e) => {
   }
 }, { passive: false });
 
-resetForm();
-resetHabitForm();
-loadTheme();
-render();
-renderHabits();
-updateFocusButtonState();
+async function init() {
+  await loadLanguage();
+  updateLanguageToggleLabel();
+  resetForm();
+  resetHabitForm();
+  loadTheme();
+  await render();
+  await renderHabits();
+  await updateFocusButtonState();
+}
+
+init();
+
 setInterval(() => {
   render();
   renderHabits();

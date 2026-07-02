@@ -159,6 +159,41 @@ h1 {
   text-align: center;
 }
 
+.language-group {
+  display: flex;
+  gap: 2px;
+  background: var(--input-bg);
+  border-radius: 8px;
+  padding: 2px;
+  margin-bottom: 6px;
+}
+
+.language-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.language-pill:hover {
+  color: var(--fg);
+}
+
+.language-pill.active {
+  background: var(--card-bg);
+  color: var(--fg);
+}
+
 #task-form {
   position: relative;
   margin-bottom: 28px;

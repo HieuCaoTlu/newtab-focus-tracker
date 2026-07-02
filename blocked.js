@@ -15,17 +15,17 @@ function tick() {
   chrome.storage.local.get([FOCUS_KEY], (result) => {
     const session = result[FOCUS_KEY];
     if (!session || !session.active) {
-      countdownEl.textContent = "Đã kết thúc";
+      countdownEl.textContent = t("blockedEnded");
       return;
     }
     const remaining = session.endTime - Date.now();
     if (remaining <= 0) {
-      countdownEl.textContent = "Đã kết thúc";
+      countdownEl.textContent = t("blockedEnded");
       return;
     }
     countdownEl.textContent = formatDuration(remaining);
   });
 }
 
-tick();
+loadLanguage().then(tick);
 setInterval(tick, 1000);
