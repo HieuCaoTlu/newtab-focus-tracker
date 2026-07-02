@@ -1,43 +1,45 @@
-# Task New Tab
+# Newtab Focus Tracker
 
-Extension giúp thay thế trang New Tab mặc định bằng một không gian làm việc cá nhân: theo dõi deadline, duy trì thói quen hằng ngày, và chủ động chặn các trang gây xao nhãng khi cần tập trung sâu.
+*[Tiếng Việt](README.vi.md)*
 
-## Chức năng chính
+A Chrome extension that replaces the default New Tab page with a personal workspace: track tasks by deadline, keep up daily habits, and actively block distracting sites when you need deep focus.
 
-1. 📝 Quản lý công việc
-   - Thêm công việc kèm emoji và deadline
-   - Sửa, xóa hoặc đánh dấu hoàn thành
-   - Sắp xếp theo thời gian còn lại, phân trang bằng cuộn chuột
+## Main features
 
-2. 🔁 Thói quen hằng ngày
-   - Tạo thói quen lặp lại theo ngày trong tuần tùy chọn
-   - Đánh dấu hoàn thành mỗi ngày, tính streak
-   - Xem/sửa lịch sử các ngày đã hoàn thành
+1. 📝 Task management
+   - Add tasks with an emoji and a deadline
+   - Edit, delete, or mark tasks as complete
+   - Sorted by time remaining, paginated with mouse scroll
 
-3. 🎯 Chế độ Tập trung
-   - Nhập danh sách tên miền muốn chặn và chọn thời lượng
-   - Người dùng KHÔNG THỂ truy cập các trang đó khi đang tập trung
-   - Có thêm thêm các trang mới muốn block khi đang tập trung
+2. 🔁 Daily habits
+   - Create recurring habits on selected days of the week
+   - Mark done each day and track streaks
+   - View/edit the history of completed days
 
-## Chức năng phụ
+3. 🎯 Focus mode
+   - Enter a list of domains to block and pick a duration
+   - Blocked sites are truly unreachable in any tab while focus is active
+   - Add more domains to block even while a focus session is running
 
-1. ⏳ Lịch sử hoàn thành
-   - Lưu lại các công việc đã đánh dấu xong
-   - Xóa từng mục khỏi lịch sử
+## Secondary features
 
-2. 🌗 Giao diện
-   - Chuyển đổi sáng / tối, ghi nhớ lựa chọn
+1. ⏳ Completed history
+   - Keeps a record of tasks marked as done
+   - Remove individual entries from history
 
-3. 📤 Xuất / nhập dữ liệu
-   - Xuất toàn bộ công việc, thói quen, lịch sử ra file JSON
-   - Nhập lại dữ liệu từ file đã xuất
+2. 🌗 Theme
+   - Toggle light / dark mode, remembers your choice
 
-## Cài đặt
+3. 📤 Export / import data
+   - Export all tasks, habits, and history to a JSON file
+   - Re-import data from an exported file
 
-1. Mở `chrome://extensions`
-2. Bật **Developer mode**
-3. Chọn **Load unpacked** và trỏ tới thư mục dự án
+## Installation
 
-## Công nghệ
+1. Open `chrome://extensions`
+2. Enable **Developer mode**
+3. Click **Load unpacked** and select the project folder
 
-Vanilla JS, Manifest V3, Chromium API
+## Tech stack
+
+Vanilla JS, Manifest V3, Chromium APIs
