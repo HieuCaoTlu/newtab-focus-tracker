@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Task New Tab",
+  "version": "1.0.0",
+  "description": "Hiển thị danh sách công việc với emoji và thời gian còn lại trên New Tab",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": ["storage", "declarativeNetRequest", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

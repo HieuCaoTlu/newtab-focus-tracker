@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Trang mới</title>
+<script src="theme-init.js"></script>
+<link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="newtab.css">
+<script type="module" src="vendor/emoji-picker/index.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Công việc</h1>
+      <div class="header-actions">
+        <button id="focus-toggle" class="text-btn" title="Focus">
+          <i id="focus-toggle-icon" class="fa-solid fa-crosshairs"></i>
+          <span id="focus-toggle-label">Tập trung</span>
+        </button>
+        <button id="history-toggle" class="icon-btn" title="Lịch sử hoàn thành">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </button>
+        <div class="settings-wrapper">
+          <button id="settings-toggle" class="icon-btn" title="Cài đặt">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+          <div id="settings-menu" class="settings-menu hidden">
+            <button id="theme-toggle" class="settings-item">
+              <i class="fa-solid fa-moon"></i>
+              <span>Đổi giao diện</span>
+            </button>
+            <button id="export-btn" class="settings-item">
+              <i class="fa-solid fa-file-export"></i>
+              <span>Xuất dữ liệu</span>
+            </button>
+            <button id="import-btn" class="settings-item">
+              <i class="fa-solid fa-file-import"></i>
+              <span>Nhập dữ liệu</span>
+            </button>
+            <input type="file" id="import-file" accept="application/json" class="hidden">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="task-form">
+      <div class="form-row">
+        <button type="button" id="emoji-trigger" class="emoji-trigger">🔥</button>
+        <input type="text" id="title" placeholder="Tên công việc" required>
+        <input type="date" id="deadline" required>
+        <button type="submit" id="submit-btn">Thêm</button>
+        <button type="button" id="complete-btn" class="hidden" title="Hoàn thành">
+          <i class="fa-solid fa-check"></i>
+        </button>
+        <button type="button" id="delete-btn" class="hidden" title="Xóa">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <input type="hidden" id="edit-id">
+      <input type="hidden" id="emoji" value="🔥">
+
+      <div id="emoji-picker-popup" class="emoji-popup hidden">
+        <emoji-picker data-source="vendor/emoji-picker/emoji-data.json"></emoji-picker>
+      </div>
+    </form>
+
+    <ul id="task-list"></ul>
+    <div id="task-dots" class="dots"></div>
+
+    <div class="section-header">
+      <h1>Thói quen</h1>
+      <button id="habit-create-btn" class="icon-btn" title="Tạo thói quen mới">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+    <div id="habit-list" class="habit-list"></div>
+    <div id="habit-dots" class="dots dots-horizontal"></div>
+  </div>
+
+  <div id="habit-modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <form id="habit-form">
+        <div class="form-row">
+          <button type="button" id="habit-detail-back" class="icon-btn hidden" title="Quay lại">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <button type="button" id="habit-emoji-trigger" class="emoji-trigger">🔥</button>
+          <input type="text" id="habit-title" placeholder="Tên thói quen" required>
+          <button type="submit" id="habit-submit-btn">Thêm</button>
+          <button type="button" id="habit-delete-btn" class="hidden" title="Xóa">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+        <input type="hidden" id="habit-emoji" value="🔥">
+        <input type="hidden" id="habit-edit-id">
+
+        <div id="habit-days" class="habit-days">
+          <label class="habit-day-pill" data-all><input type="checkbox"> Tất cả</label>
+          <label class="habit-day-pill"><input type="checkbox" value="1"> T2</label>
+          <label class="habit-day-pill"><input type="checkbox" value="2"> T3</label>
+          <label class="habit-day-pill"><input type="checkbox" value="3"> T4</label>
+          <label class="habit-day-pill"><input type="checkbox" value="4"> T5</label>
+          <label class="habit-day-pill"><input type="checkbox" value="5"> T6</label>
+          <label class="habit-day-pill"><input type="checkbox" value="6"> T7</label>
+          <label class="habit-day-pill"><input type="checkbox" value="0"> CN</label>
+        </div>
+
+        <div id="habit-emoji-picker-popup" class="emoji-popup hidden">
+          <emoji-picker data-source="vendor/emoji-picker/emoji-data.json"></emoji-picker>
+        </div>
+      </form>
+
+      <ul id="habit-modal-list"></ul>
+
+      <div id="habit-detail" class="habit-detail hidden">
+        <div class="habit-detail-add-row">
+          <input type="date" id="habit-detail-add-date" />
+          <button type="button" id="habit-detail-add-btn" class="icon-btn" title="Thêm ngày"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <ul id="habit-detail-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="history-modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h1>Đã hoàn thành</h1>
+      </div>
+      <ul id="history-list"></ul>
+    </div>
+  </div>
+
+  <div id="focus-modal-overlay" class="modal-overlay hidden">
+    <div class="modal focus-modal">
+      <div class="modal-header">
+        <h1>Focus</h1>
+      </div>
+      <form id="focus-form">
+        <label class="focus-label" for="focus-domains">Tên miền muốn chặn (mỗi dòng một tên miền)</label>
+        <textarea id="focus-domains" placeholder="facebook.com&#10;youtube.com&#10;tiktok.com" rows="5" required></textarea>
+
+        <label class="focus-label">Thời gian tập trung</label>
+        <div id="focus-duration-pills" class="focus-duration-pills">
+          <button type="button" class="focus-duration-pill" data-minutes="25">25 phút</button>
+          <button type="button" class="focus-duration-pill" data-minutes="45">45 phút</button>
+          <button type="button" class="focus-duration-pill" data-minutes="60">1 giờ</button>
+          <button type="button" class="focus-duration-pill" data-minutes="120">2 giờ</button>
+        </div>
+        <input type="number" id="focus-custom-minutes" min="1" placeholder="Hoặc nhập số phút tùy chỉnh">
+
+        <button type="submit" id="focus-start-btn">Bắt đầu Focus</button>
+      </form>
+
+      <div id="focus-active-view" class="focus-active-view hidden">
+        <div class="focus-active-countdown">
+          <i class="fa-solid fa-hourglass-half fa-spin-pulse"></i>
+          <span id="focus-active-time">--:--</span>
+        </div>
+        <p class="focus-active-hint">Các tên miền sau đang bị chặn cho đến khi hết giờ:</p>
+        <ul id="focus-active-domains" class="focus-active-domains"></ul>
+
+        <form id="focus-add-domain-form" class="focus-add-domain-form">
+          <input type="text" id="focus-add-domain-input" placeholder="Thêm tên miền, VD: reddit.com" required>
+          <button type="submit" title="Thêm"><i class="fa-solid fa-plus"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>

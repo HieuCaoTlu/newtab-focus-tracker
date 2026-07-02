@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "PowerShell(\\(Get-Content -Raw d:\\\\Coding\\\\new_tab_extension\\\\newtab.css\\) -replace 'body\\\\.light', '.light' | Set-Content -NoNewline -Encoding utf8 d:\\\\Coding\\\\new_tab_extension\\\\newtab.css)"
+    ]
+  }
+}
